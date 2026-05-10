@@ -15,6 +15,7 @@ on:
           - news-junkie
           - dev-backend
           - dev-frontend
+          - dev-mobile
           - devops-sre
           - data-engineer
           - data-scientist
@@ -30,6 +31,8 @@ on:
           - sports-fan
           - nature-lover
           - student-junior
+          - crypto-builder
+          - designer-ux
         default: news-junkie
       country:
         description: "País principal (afecta fuentes locales)"
@@ -42,6 +45,34 @@ on:
         required: false
         type: choice
         options: ["", rioplatense, accesible, ejecutivo, tecnico-directo, critico, academico]
+      voice_style:
+        description: "Voice style (texto libre, opcional — pisa al tono)"
+        required: false
+        type: string
+      audience:
+        description: "Audiencia objetivo (texto libre, opcional)"
+        required: false
+        type: string
+      style:
+        description: "Estilo del brief"
+        required: false
+        type: choice
+        options: [detailed, express]
+        default: detailed
+      max_news_per_interest:
+        description: "Máximo de noticias por interés"
+        required: false
+        type: string
+        default: "5"
+      channels:
+        description: "Canales de delivery (CSV: email,telegram,discord,slack,rss)"
+        required: false
+        type: string
+        default: "email,telegram"
+      email_address:
+        description: "Email destino (si email está en channels)"
+        required: false
+        type: string
       hour_local:
         description: "Hora local de envío (0-23)"
         required: false
@@ -71,6 +102,8 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
 
+      # TODO Fase II: cambiar a TestPyPI temporalmente:
+      #   pip install -i https://test.pypi.org/simple/ -U dilux-news
       - run: pip install -U dilux-news
 
       - run: |
@@ -79,6 +112,12 @@ jobs:
             --template "${{ inputs.profile_template }}" \
             --country "${{ inputs.country }}" \
             --tone "${{ inputs.tone_override }}" \
+            --voice-style "${{ inputs.voice_style }}" \
+            --audience "${{ inputs.audience }}" \
+            --style "${{ inputs.style }}" \
+            --max-news-per-interest "${{ inputs.max_news_per_interest }}" \
+            --channels "${{ inputs.channels }}" \
+            --email "${{ inputs.email_address }}" \
             --hour "${{ inputs.hour_local }}" \
             --tz "${{ inputs.timezone }}" \
             --frequency "${{ inputs.frequency }}"
@@ -86,7 +125,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "setup: configure dilux-news"
-          file_pattern: "config.yaml SETUP_PENDIENTE.md"
+          file_pattern: "config.yaml .env.example SETUP_PENDIENTE.md"
 
       - run: |
           echo "✅ Setup completo." >> $GITHUB_STEP_SUMMARY
@@ -94,3 +133,8 @@ jobs:
           echo "Próximos pasos:" >> $GITHUB_STEP_SUMMARY
           echo "1. Cargá los secrets que aparecen en SETUP_PENDIENTE.md (commiteado por este workflow)." >> $GITHUB_STEP_SUMMARY
           echo "2. Dispará manualmente el workflow 'Daily Brief' para probar." >> $GITHUB_STEP_SUMMARY
+          if [ -f cron_suggestion.txt ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Cron sugerido (para tu hora/frecuencia/tz): \`$(cat cron_suggestion.txt)\`" >> $GITHUB_STEP_SUMMARY
+            echo "Si querés cambiar la hora, edití manualmente \`.github/workflows/daily.yml\`." >> $GITHUB_STEP_SUMMARY
+          fi
