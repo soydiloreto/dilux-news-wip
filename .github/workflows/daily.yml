@@ -18,10 +18,14 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
 
-      # TODO Fase II: cambiar a TestPyPI temporalmente para validación end-to-end:
-      #   pip install -i https://test.pypi.org/simple/ -U dilux-news
-      # En Fase III (publicación pública), volver a PyPI real:
-      - run: pip install -U dilux-news
+      # Fase II: TestPyPI temporal para validación end-to-end.
+      # --extra-index-url apunta a PyPI real para resolver feedparser/pyyaml/requests
+      # (TestPyPI no espeja deps). En Fase III revertir a `pip install -U dilux-news`.
+      - run: |
+          pip install \
+            --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            -U dilux-news
 
       - run: dilux-news validate
 

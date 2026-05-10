@@ -102,9 +102,13 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
 
-      # TODO Fase II: cambiar a TestPyPI temporalmente:
-      #   pip install -i https://test.pypi.org/simple/ -U dilux-news
-      - run: pip install -U dilux-news
+      # Fase II: TestPyPI temporal. --extra-index-url para deps desde PyPI real.
+      # En Fase III revertir a `pip install -U dilux-news`.
+      - run: |
+          pip install \
+            --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            -U dilux-news
 
       - run: |
           dilux-news setup-from-inputs \
