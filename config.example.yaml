@@ -1,0 +1,50 @@
+# Config base de Dilux News.
+# El wizard genera/edita este archivo. También podés editarlo a mano.
+# Ver schema completo: https://github.com/soydiloreto/dilux-news-core/blob/main/docs/config-schema.md
+
+schema_version: "1.0"
+
+profile:
+  name: "Tu Nombre"
+  countries: [argentina]
+  tone: rioplatense
+
+# Topics que querés en tu brief. Ver lista: dilux-news list-topics
+interests:
+  - topic: news-general
+    coverage: both        # local | global | both
+  - topic: tech-news
+    coverage: both
+
+ai_country_filter:
+  enabled: true
+
+output:
+  style: detailed         # detailed | express
+  max_news_per_interest: 5
+
+window:
+  hours_back: 48
+
+schedule:
+  frequency: weekday      # daily | weekday | weekly
+  hour_local: 8
+  timezone: "America/Argentina/Buenos_Aires"
+
+# Activá los canales que quieras. Cada canal requiere secrets en GitHub Settings.
+delivery:
+  email:
+    enabled: false
+    from: "tu@gmail.com"
+    to: ["tu@gmail.com"]
+  telegram:
+    enabled: false
+  discord:
+    enabled: false
+  slack:
+    enabled: false
+  rss:
+    enabled: false
+
+telemetry:
+  enabled: false          # opt-in, default OFF

@@ -1,0 +1,12 @@
+# Local env
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Setup wizard runtime artifacts
+SETUP_PENDIENTE.md

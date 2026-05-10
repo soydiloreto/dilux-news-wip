@@ -1,0 +1,96 @@
+name: 🔧 Setup Wizard
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Tu nombre (aparece en el brief)"
+        required: true
+        type: string
+      profile_template:
+        description: "Plantilla de perfil base"
+        required: true
+        type: choice
+        options:
+          - news-junkie
+          - dev-backend
+          - dev-frontend
+          - devops-sre
+          - data-engineer
+          - data-scientist
+          - security-engineer
+          - pm-tech
+          - engineering-manager
+          - fintech-pro
+          - founder-startup
+          - ai-researcher
+          - business-pro
+          - culture-buff
+          - science-geek
+          - sports-fan
+          - nature-lover
+          - student-junior
+        default: news-junkie
+      country:
+        description: "País principal (afecta fuentes locales)"
+        required: true
+        type: choice
+        options: [argentina, chile, brasil, colombia, espana, mexico, peru, uruguay, usa-global-en]
+        default: argentina
+      tone_override:
+        description: "Tono del brief (opcional)"
+        required: false
+        type: choice
+        options: ["", rioplatense, accesible, ejecutivo, tecnico-directo, critico, academico]
+      hour_local:
+        description: "Hora local de envío (0-23)"
+        required: false
+        type: string
+        default: "8"
+      timezone:
+        description: "Timezone IANA"
+        required: false
+        type: string
+        default: "America/Argentina/Buenos_Aires"
+      frequency:
+        description: "Frecuencia"
+        required: false
+        type: choice
+        options: [daily, weekday, weekly]
+        default: weekday
+
+permissions:
+  contents: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - run: pip install -U dilux-news
+
+      - run: |
+          dilux-news setup-from-inputs \
+            --name "${{ inputs.name }}" \
+            --template "${{ inputs.profile_template }}" \
+            --country "${{ inputs.country }}" \
+            --tone "${{ inputs.tone_override }}" \
+            --hour "${{ inputs.hour_local }}" \
+            --tz "${{ inputs.timezone }}" \
+            --frequency "${{ inputs.frequency }}"
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "setup: configure dilux-news"
+          file_pattern: "config.yaml SETUP_PENDIENTE.md"
+
+      - run: |
+          echo "✅ Setup completo." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Próximos pasos:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Cargá los secrets que aparecen en SETUP_PENDIENTE.md (commiteado por este workflow)." >> $GITHUB_STEP_SUMMARY
+          echo "2. Dispará manualmente el workflow 'Daily Brief' para probar." >> $GITHUB_STEP_SUMMARY
