@@ -129,7 +129,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "setup: configure dilux-news"
-          file_pattern: "config.yaml .env.example SETUP_PENDIENTE.md"
+          file_pattern: "config.yaml .env.example"
 
       - run: |
           echo "✅ Setup completo." >> $GITHUB_STEP_SUMMARY
