@@ -130,7 +130,11 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add config.yaml .env.example SETUP_PENDIENTE.md 2>/dev/null || true
+          # Archivo por archivo: git add con múltiples paths falla TODO si
+          # uno no existe (no stagea nada). Loop separado evita eso.
+          for f in config.yaml .env.example SETUP_PENDIENTE.md; do
+            git add "$f" 2>/dev/null || true
+          done
           if git diff --cached --quiet; then
             echo "nada para commitear"
             exit 0
