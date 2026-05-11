@@ -126,10 +126,17 @@ jobs:
             --tz "${{ inputs.timezone }}" \
             --frequency "${{ inputs.frequency }}"
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "setup: configure dilux-news"
-          file_pattern: "config.yaml .env.example"
+      - name: Commit config
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add config.yaml .env.example SETUP_PENDIENTE.md 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nada para commitear"
+            exit 0
+          fi
+          git commit -m "setup: configure dilux-news"
+          git push
 
       - run: |
           echo "✅ Setup completo." >> $GITHUB_STEP_SUMMARY

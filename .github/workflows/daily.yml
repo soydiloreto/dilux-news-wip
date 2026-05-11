@@ -44,7 +44,14 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "brief: auto"
-          file_pattern: "briefs/*.md briefs/feed.xml SETUP_PENDIENTE.md"
+      - name: Commit brief
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add briefs/ SETUP_PENDIENTE.md 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nada para commitear"
+            exit 0
+          fi
+          git commit -m "brief: auto"
+          git push
